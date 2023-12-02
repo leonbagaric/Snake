@@ -62,46 +62,6 @@ namespace SnakeAnatomy
         }
         //-kraj singletona
 
-
-        //prebaceno kretanje
-        public bool SetPosition()
-        {
-            ConsoleKeyInfo key = Console.ReadKey(true);
-
-            //DELAY OD 500ms -> 0.5 sec -> treba isprobavat jel dosta i tweakat
-            Thread.Sleep(500);
-
-
-            switch (key.Key)
-            {
-                case ConsoleKey.LeftArrow:
-                case ConsoleKey.A:
-                    this.positionX -= 1;
-                    return true;
-                    break;
-                case ConsoleKey.RightArrow:
-                case ConsoleKey.D:
-                    this.positionX += 1;
-                    return true;
-                    break;
-                case ConsoleKey.UpArrow:
-                case ConsoleKey.W:
-                    positionY += 1;
-                    return true;
-                    break;
-                case ConsoleKey.DownArrow:
-                case ConsoleKey.S:
-                    positionY -= 1;
-                    return true;
-                    break;
-                case ConsoleKey.Escape:
-                    return false;
-                    break;
-                default:
-                    return true;
-                    break;
-            }
-        }
     }
 
     public class Body : Segment
