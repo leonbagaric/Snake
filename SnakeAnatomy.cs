@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SnakeAnatomy
 {
 
-    public class Segment
+    public abstract class Segment
     {
         public int positionX, positionY;
         public int previousX, previousY;
@@ -32,46 +32,17 @@ namespace SnakeAnatomy
         }
     }
 
-    public sealed class Head : Segment
+    public class Head : Segment
     {
-
-        private static Head instance = null;
-        private static readonly object padlock = new object();
-
-        public Head()
+        public Head(int x, int y): base(x, y)
         {
 
         }
-
-        public Head(int x, int y)
-        {
-            positionX = x;
-            positionY = y;
-        }
-
-        /*Singleton do iduceg komentara, osigurava da ima samo 
-        1 instanca glave -> ne moze nitko napraviti 2+ glave
-        a klasa sealed znaci da se ne moze naslijediti (radi se tako)*/
-        public static Head Instance
-        {
-            get
-            {
-                lock (padlock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new Head();
-                    }
-                    return instance;
-                }
-            }
-        }
-        //-kraj singletona
 
         public void SetPosition(int x, int y)
         {
-            this.positionX = x;
-            this.positionY = y;
+            positionX = x;
+            positionY = y;
         }
 
     }
@@ -79,15 +50,15 @@ namespace SnakeAnatomy
     public class Body : Segment
     {
 
-        public Body(int positionX, int positionY)
+        public Body(int x, int y):base(x, y)
         {
 
         }
 
         public void SetPosition(Segment master)
         {
-            this.positionX = master.previousX;
-            this.positionY = master.previousY;
+            positionX = master.previousX;
+            positionY = master.previousY;
             master.previousX = master.positionX;
             master.previousY = master.positionY;
         }

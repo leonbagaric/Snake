@@ -26,12 +26,11 @@ public class Game
         GameStart();
 
         /*
-         * Znaci sad je napravljen dos dobar dio posla
-         * imamo renderanje zasad i jos par stvari je sredeno al ima problem koji neznam jos do ceg je
-         * 
          * znaci kad upalis prva stvar je da se body (x) spawna na 0,0 umjesto 9,10 ko sto bi trebo na prvom frameu al poslje radi ok
          * druga stvar je sto ljevo i desno mozes noramlano ic al gore i dolje ne radi kako treba iako runa istom logikom
          * treca stvar je da randomly nece radit ni ljevo desno neg sam stane u mjestu i moras drzat A il D da krene dalje????
+         * 
+         * update: nez jesam sjebo al kad idem gore/dole krene se x povecat za otp 50 i onda treperi na dobrom mjestu i mjestu +50 na x osi
          */
     }
     public Game(int width, int height)
@@ -46,7 +45,7 @@ public class Game
         GameLoop();
 
     }
-    public void gameDraw()
+    public void GameDraw()
     {
 
         //Ovih par linija su uzasne al mi se nije dalo razmisljat previse pa svaki loop popunjavam ovu listu
@@ -54,9 +53,9 @@ public class Game
 
         List < Tuple<int, int, string> > occupiedPositions= new List<Tuple<int, int, string>>();
         occupiedPositions.Add(new(snake.head.positionX, snake.head.positionY, "Head"));
-        foreach (Segment seg in snake.wholeBody)
+        foreach (Body body in snake.wholeBody)
         {
-            occupiedPositions.Add(new(seg.positionX, seg.positionY,"Body"));
+            occupiedPositions.Add(new(body.positionX, body.positionY,"Body"));
         }
 
 
@@ -66,7 +65,7 @@ public class Game
             {
                 if (occupiedPositions.Contains(new(y,x,"Head")))
                 {
-                    Console.Write('X');
+                    Console.Write('o');
                 }
                 else if (occupiedPositions.Contains(new(y, x, "Body")))
                 {
@@ -87,34 +86,33 @@ public class Game
         {
             if (Console.KeyAvailable)
             {
-                if (Console.ReadKey(true).Key == ConsoleKey.A || Console.ReadKey(true).Key == ConsoleKey.LeftArrow)
+                if (Console.ReadKey(intercept: true).Key == ConsoleKey.A || Console.ReadKey(true).Key == ConsoleKey.LeftArrow)
                 {
                     snake.currentlyFacing = 'W';
                 }
-                else if (Console.ReadKey(true).Key == ConsoleKey.D || Console.ReadKey(true).Key == ConsoleKey.RightArrow)
+                else if (Console.ReadKey(intercept: true).Key == ConsoleKey.D || Console.ReadKey(true).Key == ConsoleKey.RightArrow)
                 {
                     snake.currentlyFacing = 'E';
                 }
-                else if (Console.ReadKey(true).Key == ConsoleKey.S || Console.ReadKey(true).Key == ConsoleKey.DownArrow)
+                else if (Console.ReadKey(intercept: true).Key == ConsoleKey.S || Console.ReadKey(true).Key == ConsoleKey.DownArrow)
                 {
                     snake.currentlyFacing = 'S';
                 }
-                else if (Console.ReadKey(true).Key == ConsoleKey.W || Console.ReadKey(true).Key == ConsoleKey.UpArrow)
+                else if (Console.ReadKey(intercept: true).Key == ConsoleKey.W || Console.ReadKey(true).Key == ConsoleKey.UpArrow)
                 {
                     snake.currentlyFacing = 'N';
                 }
-                else if(Console.ReadKey(true).Key == ConsoleKey.Escape)
+                else if(Console.ReadKey(intercept: true).Key == ConsoleKey.Escape)
                 {
                     this.isRunning = false;
                 }
             }
             snake.MoveSnake();
             Console.Clear();
-            gameDraw();
+            GameDraw();
 
-
-            //DELAY OD 500ms -> 0.5 sec -> treba isprobavat jel dosta i tweakat
-            Thread.Sleep(500);
+            //probo sam s async wait al onda cijela funkcija morabit async pa mi se nije dalo zajebavat
+            Thread.Sleep(250);
         }
     }
 }
