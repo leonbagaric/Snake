@@ -24,6 +24,12 @@ namespace SnakeAnatomy
             this.positionX = positionX;
             this.positionY = positionY;
         }
+
+        public Segment(int positionXY)
+        {
+            this.positionX = positionXY;
+            this.positionY = positionXY;
+        }
     }
 
     public sealed class Head : Segment
