@@ -38,9 +38,15 @@ namespace SnakeAnatomy
         private static Head instance = null;
         private static readonly object padlock = new object();
 
-        public Head() : base(0, 0)
+        public Head()
         {
 
+        }
+
+        public Head(int x, int y)
+        {
+            positionX = x;
+            positionY = y;
         }
 
         /*Singleton do iduceg komentara, osigurava da ima samo 
@@ -62,21 +68,28 @@ namespace SnakeAnatomy
         }
         //-kraj singletona
 
+        public void SetPosition(int x, int y)
+        {
+            this.positionX = x;
+            this.positionY = y;
+        }
+
     }
 
     public class Body : Segment
     {
 
-        public Body(int positionX, int positionY):base(positionX, positionY)
+        public Body(int positionX, int positionY)
         {
 
         }
 
-        //hmhmhmhm vidi u Snake behaviour static klasu da vidis sta sam napravio s movementom
         public void SetPosition(Segment master)
         {
-            this.positionX = master.positionX;
-            this.positionY = master.positionY;
+            this.positionX = master.previousX;
+            this.positionY = master.previousY;
+            master.previousX = master.positionX;
+            master.previousY = master.positionY;
         }
 
     }
