@@ -13,22 +13,11 @@ namespace SnakeAnatomy
         public int positionX, positionY;
         public int previousX, previousY;
 
-        public Segment()
-        {
-            this.positionX = 0;
-            this.positionY = 0;
-        }
 
         public Segment(int positionX, int positionY)
         {
             this.positionX = positionX;
             this.positionY = positionY;
-        }
-
-        public Segment(int positionXY)
-        {
-            this.positionX = positionXY;
-            this.positionY = positionXY;
         }
     }
 

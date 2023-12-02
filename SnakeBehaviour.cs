@@ -36,8 +36,6 @@ namespace SnakeBehaviour
 
         public void MoveSnake()
         {
-            //head.previousX = head.positionX;
-            //head.previousY = head.positionY;
             this.head.positionX += map[currentlyFacing].Item1;
             this.head.positionY += map[currentlyFacing].Item2;
             wholeBody[0].SetPosition(head);

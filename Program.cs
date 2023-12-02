@@ -30,7 +30,8 @@ public class Game
          * druga stvar je sto ljevo i desno mozes noramlano ic al gore i dolje ne radi kako treba iako runa istom logikom
          * treca stvar je da randomly nece radit ni ljevo desno neg sam stane u mjestu i moras drzat A il D da krene dalje????
          * 
-         * update: nez jesam sjebo al kad idem gore/dole krene se x povecat za otp 50 i onda treperi na dobrom mjestu i mjestu +50 na x osi
+         * update: nez jesam sjebo al kad idem gore/dole krene se x povecat za otp 50 i onda treperi na dobrom mjestu i mjestu +50 na x osi,
+         * linija 62 procitaj
          */
     }
     public Game(int width, int height)
@@ -58,16 +59,16 @@ public class Game
             occupiedPositions.Add(new(body.positionX, body.positionY,"Body"));
         }
 
-
+        //znaci onaj bug di ti pomakne x za otp 50 je vamo, kad zamijenis u 2. for petlji x i y pojavi se taj bug
         for(int x = 0; x < height; x++)
         {
             for(int y = 0; y < width; y++)
             {
-                if (occupiedPositions.Contains(new(y,x,"Head")))
+                if (occupiedPositions.Contains(new(y, x, "Head"))) //<--zamijeni x i y pa vidi sta se dogodi
                 {
                     Console.Write('o');
                 }
-                else if (occupiedPositions.Contains(new(y, x, "Body")))
+                else if (occupiedPositions.Contains(new(y, x, "Body"))) //<--zamijeni x i y pa vidi sta se dogodi
                 {
                     Console.Write('x');
                 }
