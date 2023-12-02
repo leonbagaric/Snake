@@ -43,7 +43,6 @@ namespace SnakeBehaviour
 
         public static void MoveHead(Head head, List<Body> wholeBody)
         {
-            head.SetPosition();
             int tempPositionX = head.positionX;
             if(head.positionX != tempPositionX)
             {
