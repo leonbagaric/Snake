@@ -34,10 +34,29 @@ namespace SnakeBehaviour
             wholeBody.Add(body);
         }
 
-        public void MoveSnake()
+        public void MoveSnake(int width, int height)
         {
-            this.head.positionX += map[currentlyFacing].Item1;
-            this.head.positionY += map[currentlyFacing].Item2;
+            if(this.head.positionX + map[currentlyFacing].Item1 <= 0)
+            {
+                this.head.positionX = width - 1;
+            }
+            else if (this.head.positionX + map[currentlyFacing].Item1 >= width)
+            {
+                this.head.positionX = 1;
+            }
+            else if (this.head.positionY + map[currentlyFacing].Item2 <= 0)
+            {
+                this.head.positionY = height - 1;
+            }
+            else if (this.head.positionY + map[currentlyFacing].Item2 >= height)
+            {
+                this.head.positionY = 1;
+            }
+            else
+            {
+                this.head.positionX += map[currentlyFacing].Item1;
+                this.head.positionY += map[currentlyFacing].Item2;
+            }
             wholeBody[0].SetPosition(head);
             if (wholeBody.Count > 1)
                 for (int i = 1; i < wholeBody.Count; i++)

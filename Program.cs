@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using SnakeAnatomy;
 using SnakeBehaviour;
+
 
 public class Program
 {
@@ -14,8 +16,14 @@ public class Program
 
 public class Game
 {
+    List<Tuple<int, int, string>> occupiedPositions = new();
+    List<Tuple<int, int, string>> lastOccupiedPositions = new();
+    Apple apple;
+    ConsoleKey lastKey;
+    public int currentFrame = 0;
     public int width, height;
     public bool isRunning = false;
+    public int score = 0;
  
     Snake snake;
     public Game()
@@ -24,15 +32,6 @@ public class Game
         this.height = 40;
         snake = new Snake();
         GameStart();
-
-        /*
-         * znaci kad upalis prva stvar je da se body (x) spawna na 0,0 umjesto 9,10 ko sto bi trebo na prvom frameu al poslje radi ok
-         * druga stvar je sto ljevo i desno mozes noramlano ic al gore i dolje ne radi kako treba iako runa istom logikom
-         * treca stvar je da randomly nece radit ni ljevo desno neg sam stane u mjestu i moras drzat A il D da krene dalje????
-         * 
-         * update: nez jesam sjebo al kad idem gore/dole krene se x povecat za otp 50 i onda treperi na dobrom mjestu i mjestu +50 na x osi,
-         * linija 62 procitaj
-         */
     }
     public Game(int width, int height)
     {
@@ -43,50 +42,68 @@ public class Game
     public void GameStart()
     {
         isRunning = true;
+        this.apple = new Apple(this.width, this.height, this.occupiedPositions);
+        this.occupiedPositions.Add(new(this.apple.positionX, this.apple.positionY, "Apple"));
         GameLoop();
 
     }
     public void GameDraw()
     {
-
-        //Ovih par linija su uzasne al mi se nije dalo razmisljat previse pa svaki loop popunjavam ovu listu
-        //umjesto da updateam kad se promjeni pozicija neceg
-
-        List < Tuple<int, int, string> > occupiedPositions= new List<Tuple<int, int, string>>();
+        this.currentFrame += 1;
+        lastOccupiedPositions = occupiedPositions;
+        occupiedPositions.Clear();
+        if(this.currentFrame != 1)
+            occupiedPositions.Add(new(this.apple.positionX, this.apple.positionY, "Apple"));
         occupiedPositions.Add(new(snake.head.positionX, snake.head.positionY, "Head"));
         foreach (Body body in snake.wholeBody)
         {
-            occupiedPositions.Add(new(body.positionX, body.positionY,"Body"));
+            occupiedPositions.Add(new(body.positionX, body.positionY, "Body"));
         }
 
-        //znaci onaj bug di ti pomakne x za otp 50 je vamo, kad zamijenis u 2. for petlji x i y pojavi se taj bug
-        for(int x = 0; x < height; x++)
+        for (int x = 0; x < height; x++)
         {
-            for(int y = 0; y < width; y++)
+            for (int y = 0; y < width; y++)
             {
-                if (occupiedPositions.Contains(new(y, x, "Head"))) //<--zamijeni x i y pa vidi sta se dogodi
+                
+                if (occupiedPositions.Contains(new(y, x, "Head")))
                 {
-                    Console.Write('o');
+                    Console.SetCursorPosition(y, x);
+                    Console.Write('O');
                 }
-                else if (occupiedPositions.Contains(new(y, x, "Body"))) //<--zamijeni x i y pa vidi sta se dogodi
+                else if (occupiedPositions.Contains(new(y, x, "Body")))
                 {
+                    Console.SetCursorPosition(y, x);
                     Console.Write('x');
                 }
-                else
+                else if (occupiedPositions.Contains(new(y, x, "Apple")))
                 {
+                    Console.SetCursorPosition(y, x);
+                    Console.Write('@');
+                }
+
+                if (x == 0 || y == 0 || x == height - 1 || y == width - 1)
+                {
+                    Console.SetCursorPosition(y, x);
+                    Console.Write('#');
+                }
+                if (y == lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item1 && x == lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item2)
+                {
+                    Console.SetCursorPosition(y, x);
                     Console.Write(' ');
                 }
             }
+            Console.Write('\n');
+
         }
     }
 
-
-    public void GameLoop()
+    void KeyPress()
     {
+
         while (this.isRunning)
-        {
             if (Console.KeyAvailable)
             {
+                lastKey = Console.ReadKey(intercept: true).Key;
                 if (Console.ReadKey(intercept: true).Key == ConsoleKey.A || Console.ReadKey(true).Key == ConsoleKey.LeftArrow)
                 {
                     snake.currentlyFacing = 'W';
@@ -103,17 +120,49 @@ public class Game
                 {
                     snake.currentlyFacing = 'N';
                 }
-                else if(Console.ReadKey(intercept: true).Key == ConsoleKey.Escape)
+                else if (Console.ReadKey(intercept: true).Key == ConsoleKey.Escape)
                 {
                     this.isRunning = false;
                 }
             }
-            snake.MoveSnake();
-            Console.Clear();
+    }
+
+    public void GameLoop()
+    {
+        new Thread(delegate ()
+        {
+            KeyPress();
+        }).Start();
+        while (this.isRunning)
+        {
+            
+            snake.MoveSnake(this.width, this.height);
+            if (snake.head.positionX == this.occupiedPositions[0].Item1 && snake.head.positionY == this.occupiedPositions[0].Item2)
+            {
+                score++;
+                snake.AddBodySegment(new Body(lastOccupiedPositions[lastOccupiedPositions.Count-1].Item1, lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item2));
+                this.apple = new Apple(this.width, this.height, this.occupiedPositions);
+                this.occupiedPositions[0] = new(apple.positionX,apple.positionY,"Apple");
+            }
             GameDraw();
 
-            //probo sam s async wait al onda cijela funkcija morabit async pa mi se nije dalo zajebavat
-            Thread.Sleep(250);
+            Thread.Sleep(100);
+        }
+    }    
+    
+    public class Apple
+    {
+        public int positionX, positionY;
+
+        public Apple(int width,int height, List<Tuple<int, int, string>> occupiedPositions)
+        {
+            Random rnd = new Random();
+            do
+            {
+                positionX = rnd.Next(1, width - 1);
+                positionY = rnd.Next(1, height - 1);
+            }
+            while (occupiedPositions.Contains(new(positionX, positionY, "Head")) || occupiedPositions.Contains(new(positionX, positionY, "Body")) || occupiedPositions.Contains(new(positionX, positionY, "Apple")));
         }
     }
 }
