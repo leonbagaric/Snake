@@ -9,7 +9,7 @@ public class Program
 {
     public static void Main()
     {
-        Game game = new Game();
+        Game game = new Game(15,15);
         game.GameStart();
     }
 } 
@@ -24,8 +24,10 @@ public class Game
     public int width, height;
     public bool isRunning = false;
     public int score = 0;
- 
+    Tuple<int,int,string> a;
+    Tuple<int,int,string> b;
     Snake snake;
+
     public Game()
     {   
         this.width = 60;
@@ -49,22 +51,26 @@ public class Game
     }
     public void GameDraw()
     {
-        this.currentFrame += 1;
-        lastOccupiedPositions = occupiedPositions;
+
+
+        if (currentFrame == 0)
+        {
+            lastOccupiedPositions = new List<Tuple<int,int,string>>( occupiedPositions);
+        }
+        this.currentFrame++;
         occupiedPositions.Clear();
         if(this.currentFrame != 1)
             occupiedPositions.Add(new(this.apple.positionX, this.apple.positionY, "Apple"));
+
         occupiedPositions.Add(new(snake.head.positionX, snake.head.positionY, "Head"));
         foreach (Body body in snake.wholeBody)
         {
             occupiedPositions.Add(new(body.positionX, body.positionY, "Body"));
         }
-
         for (int x = 0; x < height; x++)
         {
             for (int y = 0; y < width; y++)
             {
-                
                 if (occupiedPositions.Contains(new(y, x, "Head")))
                 {
                     Console.SetCursorPosition(y, x);
@@ -86,15 +92,24 @@ public class Game
                     Console.SetCursorPosition(y, x);
                     Console.Write('#');
                 }
+
+
                 if (y == lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item1 && x == lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item2)
                 {
                     Console.SetCursorPosition(y, x);
                     Console.Write(' ');
                 }
             }
-            Console.Write('\n');
 
         }
+        Console.Write('\n');
+        if (currentFrame > 1)
+        {
+            Console.WriteLine(lastOccupiedPositions[lastOccupiedPositions.Count - 1]);
+            Console.WriteLine(occupiedPositions[occupiedPositions.Count-1]);
+        }
+        Console.WriteLine($"Frame {currentFrame}");
+        Console.WriteLine($"Score {score}");
     }
 
     void KeyPress()
@@ -141,12 +156,14 @@ public class Game
             {
                 score++;
                 snake.AddBodySegment(new Body(lastOccupiedPositions[lastOccupiedPositions.Count-1].Item1, lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item2));
+                occupiedPositions.Add(new(lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item1, lastOccupiedPositions[lastOccupiedPositions.Count - 1].Item2, "Body"));
                 this.apple = new Apple(this.width, this.height, this.occupiedPositions);
                 this.occupiedPositions[0] = new(apple.positionX,apple.positionY,"Apple");
-            }
+            } 
             GameDraw();
-
-            Thread.Sleep(100);
+            lastOccupiedPositions = new List<Tuple<int, int, string>>(occupiedPositions);
+            
+            Thread.Sleep(1000);
         }
     }    
     
